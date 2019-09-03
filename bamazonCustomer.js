@@ -17,9 +17,6 @@ var connection = mysql.createConnection({
   });
   
 
-  
-
-
 console.log("Welcome to Bamazon!\n\n====================")
 
 inquirer
@@ -36,5 +33,10 @@ inquirer
         }
     ])
     .then(answers => {
-
+        connection.connect(function(err) {
+            if (err) throw err;
+            console.log("connected as id " + connection.threadId);
+         
+          });
+        
     });
