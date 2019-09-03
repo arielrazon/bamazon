@@ -1,6 +1,6 @@
 
 var inquirer = require("inquirer")
-var sql = require("sql")
+var mysql = require("mysql")
 
 var connection = mysql.createConnection({
     host: "localhost",
@@ -41,6 +41,15 @@ inquirer
 
     });
 
+/*pseudocode:
+inquirer two messages
+in then statement
+use select * from product where item=id = input and quantity>0
+if yes then
+do a second connection to update the sql database to reflect remaining quantity
+once update goes through show customer total cost of purchase
+*/
+
 function queryProductID(input) {
     connection.query("SELECT * FROM PRODUCTS WHERE ITEM_ID=" + input, function (err, res) {
         if (err) throw err;
@@ -48,8 +57,13 @@ function queryProductID(input) {
             console.log("Your search found:\n\nItem ID | Product | Department | Price | Stock Remaining\n")
             console.log(res.ITEM_ID + " | " + res.PRODUCT_NAME + " | " + res.DEPARTMENT_NAME + " | $" + res.PRICE + " | " + res.STOCK_QUANTITY + " units");
             inquirer.prompt([{
-
-            }]).then(yesNo)
+                "type": "list",
+                choices: ["Yes", "No"],
+                "name": "yesNo",
+                "message": "Do you wish to proceed with your order?"
+            }]).then(yesNo => {
+                console.log(yesNo)
+            })
         }
 
 
