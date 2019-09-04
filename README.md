@@ -14,8 +14,8 @@ Bamazon is a CLI-based purchasing app that integrates with MySQL, allowing custo
 
 ----
 ## demo video
-
-
+click image below for demo video
+[![Bamazon](http://img.youtube.com/vi/jSfsyvTvcRY/0.jpg)](http://www.youtube.com/watch?v=jSfsyvTvcRY "Bamazon")
 
 ----
 ## changelog
