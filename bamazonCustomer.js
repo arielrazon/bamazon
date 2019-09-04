@@ -2,7 +2,10 @@
 var inquirer = require("inquirer")
 var mysql = require("mysql")
 
-var connection = mysql.createConnection({
+var stock;
+
+var connection = mysql.createPool({
+    connectionLimit: 10,
     host: "localhost",
 
     // Your port; if not 3306
@@ -17,29 +20,29 @@ var connection = mysql.createConnection({
 });
 
 
-console.log("Welcome to Bamazon!\n\n====================")
+console.log("Welcome to Bamazon!\n\n====================");
+//initial prompts
 
-inquirer
-    .prompt([
-        {
-            type: "number",
-            message: "What is the ID of the product you would like to buy?",
-            name: "product_id"
-        },
-        {
-            type: "number",
-            message: "How much of this product would you like to buy?",
-            name: "product_quantity"
-        }
-    ])
-    .then(answers => {
-        connection.connect(function (err) {
-            if (err) throw err;
-            console.log("connected as id " + connection.threadId);
+initialPrompt();
+
+function initialPrompt() {
+    inquirer
+        .prompt([
+            {
+                type: "number",
+                message: "What is the ID of the product you would like to buy?",
+                name: "product_id"
+            },
+            {
+                type: "number",
+                message: "How much of this product would you like to buy?",
+                name: "product_quantity"
+            }
+        ])
+        .then(answers => {
             queryProductID(answers.product_id)
-        });
-
-    });
+        })
+};
 
 /*pseudocode:
 inquirer two messages
@@ -53,22 +56,35 @@ once update goes through show customer total cost of purchase
 function queryProductID(input) {
     connection.query("SELECT * FROM PRODUCTS WHERE ITEM_ID=" + input, function (err, res) {
         if (err) throw err;
-        if (res.STOCK_QUANTITY > 1) {
+        stock = res[0].STOCK_QUANTITY
+        console.log(res[0])
+        console.log(stock)
+        if (res[0].STOCK_QUANTITY > 1) {
             console.log("Your search found:\n\nItem ID | Product | Department | Price | Stock Remaining\n")
-            console.log(res.ITEM_ID + " | " + res.PRODUCT_NAME + " | " + res.DEPARTMENT_NAME + " | $" + res.PRICE + " | " + res.STOCK_QUANTITY + " units");
+            console.log(res[0].ITEM_ID + " | " + res[0].PRODUCT_NAME + " | " + res[0].DEPARTMENT_NAME + " | $" + res[0].PRICE + " | " + res[0].STOCK_QUANTITY + " units");
             inquirer.prompt([{
-                "type": "list",
-                choices: ["Yes", "No"],
+                "type": "confirm",
                 "name": "yesNo",
                 "message": "Do you wish to proceed with your order?"
             }]).then(yesNo => {
-                console.log(yesNo)
+                if (yesNo.yesNo) {
+                    //connection.query("UPDATE PRODUCTS SET STOCK_QUANTITY = ")
+                }
+                else {
+                    console.log("OK! Let us know if you change your mind!");
+                    connection.end(function (err) {
+                        if (err) throw err
+                        console.log("Connection ended")
+                    })
+                }
             })
         }
-
-
-        else if (res.STOCK_QUANTITY === 0) {
+        else if (res[0].STOCK_QUANTITY === 0) {
             console.log("\nI'm sorry but " + res.PRODUCT_NAME + " is out of stock!")
+            connection.end(function (err) {
+                if (err) throw err
+                console.log("Connection ended")
+            })
         }
 
         console.log("\n-----------------------------------");
