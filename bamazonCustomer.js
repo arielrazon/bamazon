@@ -2,8 +2,6 @@
 var inquirer = require("inquirer")
 var mysql = require("mysql")
 
-var stock;
-
 var connection = mysql.createPool({
     connectionLimit: 10,
     host: "localhost",
@@ -44,23 +42,16 @@ function initialPrompt() {
         })
 };
 
-/*pseudocode:
-inquirer two messages
-in then statement
-use select * from product where item=id = input and quantity>0
-if yes then
-do a second connection to update the sql database to reflect remaining quantity
-once update goes through show customer total cost of purchase
-*/
-
 function queryProductID(input, quantity) {
     connection.query("SELECT * FROM PRODUCTS WHERE ITEM_ID=" + input, function (err, res) {
         if (err) throw err;
-        stock = res[0].STOCK_QUANTITY;
+        var stock = res[0].STOCK_QUANTITY;
         var price = res[0].PRICE;
-        if (res[0].STOCK_QUANTITY > 1) {
+        var totalCost = (price * quantity);
+        if (stock > 1) {
             console.log("Your search found:\n\nItem ID | Product | Department | Price | Stock Remaining\n")
-            console.log(res[0].ITEM_ID + " | " + res[0].PRODUCT_NAME + " | " + res[0].DEPARTMENT_NAME + " | $" + res[0].PRICE + " | " + res[0].STOCK_QUANTITY + " units");
+            console.log(res[0].ITEM_ID + " | " + res[0].PRODUCT_NAME + " | " + res[0].DEPARTMENT_NAME + " | $" + res[0].PRICE + " | " + stock + " units\n");
+            console.log("Your total order cost would be: $" + totalCost + "\n")
             inquirer.prompt([{
                 "type": "confirm",
                 "name": "yesNo",
@@ -69,27 +60,19 @@ function queryProductID(input, quantity) {
                 if (yesNo.yesNo) {
                     connection.query("UPDATE PRODUCTS SET STOCK_QUANTITY = " + (stock - quantity) + " WHERE ITEM_ID = " + input, function (err, res) {
                         if (err) throw err;
-
-                        console.log("Your order has been placed!\n\n The total cost is: $" + (price * quantity) + "\n\nThank you for your business!\n\n");
-                        buyAgain();
+                        console.log("Your order has been placed!\n\n The total cost is: $" + totalCost + "\n\nThank you for your business!\n");
                     }
                     );
                 }
                 else {
-                    console.log("OK! Let us know if you change your mind!");
-                    connection.end(function (err) {
-                        if (err) throw err
-                        console.log("Connection ended")
-                    });
+                    console.log("OK!\n");
+                    buyAgain();
                 }
             })
         }
         else if (res[0].STOCK_QUANTITY === 0) {
-            console.log("\nI'm sorry but " + res.PRODUCT_NAME + " is out of stock!");
-            connection.end(function (err) {
-                if (err) throw err
-                console.log("Connection ended")
-            });
+            console.log("\nI'm sorry but we are out of stock of: " + res[0].PRODUCT_NAME);
+            buyAgain();
         };
 
         console.log("\n-----------------------------------");
@@ -102,7 +85,7 @@ function buyAgain() {
         message: "Is there anything else you would like to buy today?",
         name: "newPurchase"
 
-    }]), then(result => {
+    }]).then(result => {
         if (result.newPurchase) {
             initialPrompt();
         }
