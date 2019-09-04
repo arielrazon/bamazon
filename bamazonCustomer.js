@@ -18,7 +18,7 @@ var connection = mysql.createPool({
 });
 
 
-console.log("Welcome to Bamazon!\n\n====================");
+console.log("Welcome to Bamazon!\n\n========================\n");
 //initial prompts
 
 initialPrompt();
@@ -48,8 +48,9 @@ function queryProductID(input, quantity) {
         var stock = res[0].STOCK_QUANTITY;
         var price = res[0].PRICE;
         var totalCost = (price * quantity);
-        if (stock > 1) {
-            console.log("Your search found:\n\nItem ID | Product | Department | Price | Stock Remaining\n")
+        var newStock = stock - quantity;
+        if (stock > 1 && newStock >= 0) {
+            console.log("\nYour search found:\n\nItem ID | Product | Department | Price | Stock Remaining\n")
             console.log(res[0].ITEM_ID + " | " + res[0].PRODUCT_NAME + " | " + res[0].DEPARTMENT_NAME + " | $" + res[0].PRICE + " | " + stock + " units\n");
             console.log("Your total order cost would be: $" + totalCost + "\n")
             inquirer.prompt([{
@@ -58,12 +59,16 @@ function queryProductID(input, quantity) {
                 "message": "Do you wish to proceed with your order?"
             }]).then(yesNo => {
                 if (yesNo.yesNo) {
+
                     connection.query("UPDATE PRODUCTS SET STOCK_QUANTITY = " + (stock - quantity) + " WHERE ITEM_ID = " + input, function (err, res) {
                         if (err) throw err;
-                        console.log("Your order has been placed!\n\n The total cost is: $" + totalCost + "\n\nThank you for your business!\n");
+                        console.log("\nYour order has been placed!\n\n The total cost is: $" + totalCost + "\n\nThank you for your business!\n\n========================\n");
+                        buyAgain();
                     }
-                    );
+                    )
                 }
+
+
                 else {
                     console.log("OK!\n");
                     buyAgain();
@@ -75,7 +80,7 @@ function queryProductID(input, quantity) {
             buyAgain();
         };
 
-        console.log("\n-----------------------------------");
+        console.log("\n\n========================\n\n");
     });
 };
 
@@ -90,10 +95,10 @@ function buyAgain() {
             initialPrompt();
         }
         else {
-            console.log("Thank you for your business! Please come back again soon");
+            console.log("======================\n\nThank you for your business! Please come back again soon\n");
             connection.end(function (err) {
                 if (err) throw err;
-                console.log("Connection ended");
+                console.log("Connection ended\n\n========================\n\n");
             });
         };
     });
