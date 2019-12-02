@@ -12,6 +12,13 @@ Bamazon is a CLI-based purchasing app that integrates with MySQL, allowing custo
 3. If the user wishes to proceed, the order will be placed, and the user will be brought back to the initial purchasing menu
 4. If the user does not wish to proceed, they will be asked whether they wish to purchase other items. If not, the connection will close. 
 
+## Running it locally
+
+1. Clone the repo to your local machine
+2. Initialize your MySQL Database, using MAMP or whatever method you choose. 
+3. run "npm install" through your command line in the project folder. 
+4. execute "npm start" through your command line in the project folder. 
+
 
 ## Demo video
 click image below for demo video
