@@ -20,7 +20,8 @@ click image below for demo video
 
 ----
 ## Changelog
-* 09-Sept-2019 Initial design
+* 03-Sept-2019 Initial project files created, CLI created and refined. Inquirer API connections enabled.
+* 09-Sept-2019 ReadME updated
 
 ----
 ## Thanks
