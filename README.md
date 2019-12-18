@@ -3,7 +3,7 @@
 
 ## What is Bamazon
 
-Bamazon is a CLI-based purchasing app that integrates with MySQL, allowing customers to order products based on IDs. This app also utilizes Inquirer, dotenv and Node.JS.
+Bamazon is a CLI-based purchasing app that integrates with MySQL, allowing customers to order products based on IDs. This app also utilizes Inquirer, dotEnv, and Node.JS. It utilizes the Spotify and Axios APIs
 
 ## Usage
 
